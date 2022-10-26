@@ -4,13 +4,18 @@ import datetime
 import pathlib
 from typing import List, Union
 
-from fastapi import FastAPI, Depends, Response
+from fastapi import FastAPI, Depends, Response, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
 from sqlmodel import Session, select
 from database import engine, Rider, Event, EventResult
 
 
 app = FastAPI()
 home_dir = pathlib.Path('.')
+templates = Jinja2Templates(directory="templates")
+
 
 
 # helper for dependency injection
@@ -44,9 +49,11 @@ async def startup_event():
 
 
 
-@app.get('/')
-def home():
-    return {'Data': 'Testing'}
+
+@app.get('/', response_class=HTMLResponse)
+def home(request: Request):
+    context = {'request': request}
+    return templates.TemplateResponse('index.html', context)
 
     
 @app.get('/events/', response_model=List[Event])
