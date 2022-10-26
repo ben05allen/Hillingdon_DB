@@ -37,6 +37,10 @@ MANIFEST
 # Databases
 *.db
 
+# Data directory
+data/
+
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -86,4 +90,4 @@ venv.bak/
 # Cython debug symbols
 cython_debug/
 
-xero_api/__pycache__/xero_models_nz.cpython-38.pyc
+
