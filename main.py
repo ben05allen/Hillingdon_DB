@@ -64,6 +64,52 @@ def event(event_id: int, response: Response, session: Session = Depends(get_sess
         return "Track no found"
     return track
 
+@app.post('/event/', response_model=Event, status_code=201)
+def create_event(event: Event, session: Session = Depends(get_session)):
+    session.add(event)
+    session.commit()
+    session.refresh(event)
+
+
+@app.put('/event/{event_id}', response_model=Union[Event, str])
+def update_event(event_id: int, updated_event: Event, response: Response, session: Session = Depends(get_session)):
+    
+    event = session.get(Event, event_id)
+    if event is None:
+        response.status_code = 404
+        return 'Event not found'
+
+    event_dict = updated_event.dict(exclude_unset=True)
+    for key ,val in event_dict.items():
+        setattr(event, key, val)
+    try:
+        session.add(event)
+    except:
+        session.rollback()
+        return 'Internal error'
+    else:
+        session.commit()
+        session.refresh(event)
+        return event
+
+
+@app.delete('/event/{event_id}', response_model=str, status_code=201)
+def delete_event(event_id: int, response: Response, session: Session = Depends(get_session)):
+
+    event = session.get(Event, event_id)
+    if event is None:
+        response.status_code = 404
+        return 'Event not found'
+    try:    
+        session.delete(event)
+    except:
+        session.rollback()
+        return Response(status_code=500)
+    else:
+        session.commit()
+        return Response(status_code=200)
+    
+
 
 @app.get('/riders/', response_model=List[Rider])
 def select_riders(session: Session = Depends(get_session)):
@@ -81,6 +127,11 @@ def rider(rider_id: int, response: Response, session: Session = Depends(get_sess
     return track
 
 
+@app.post('/rider/', response_model=Rider, status_code=201)
+def create_rider(rider: Rider, session: Session = Depends(get_session)):
+    session.add(rider)
+    session.commit()
+    session.refresh(rider)
 
 
 
