@@ -82,15 +82,6 @@ def rider(rider_id: int, response: Response, session: Session = Depends(get_sess
 
 
 
-# @app.post('/create-rider/{rider_id}')
-# def create_rider(rider_id: int, rider: Rider):
-#     if rider_id in rider:
-#         return {'Error': f'Rider ID {rider_id} already exists'}
-    
-#     riders[rider_id] = rider
-#     return riders[rider_id]
-
-
 
 
 def main():
