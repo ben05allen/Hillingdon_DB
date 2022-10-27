@@ -16,7 +16,6 @@ home_dir = pathlib.Path('.')
 templates = Jinja2Templates(directory="templates")
 
 
-
 # helper for dependency injection
 def get_session():
     with Session(engine) as session:
@@ -33,7 +32,7 @@ async def startup_event():
                 events = json.load(events_file)['data']
                 for event in events:
                     session.add(Event(**event))
-        session.commit()
+                session.commit()
 
         statement = select(Event)
         if session.exec(statement).first() is None:
@@ -42,7 +41,7 @@ async def startup_event():
                 riders = json.load(riders_file)['data']
                 for rider in riders:
                     session.add(Event(**rider))
-        session.commit()
+                session.commit()
 
         statement = select(EventResult)
         if session.exec(statement).first() is None:
@@ -51,7 +50,7 @@ async def startup_event():
                 results = json.load(results_file)['data']
                 for result in results:
                     session.add(EventResult(**result))
-
+                session.commit()
 
 
 @app.get('/', response_class=HTMLResponse)

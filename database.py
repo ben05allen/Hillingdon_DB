@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from typing import Optional, List
 from sqlmodel import SQLModel, create_engine, Field, Relationship
 
@@ -29,8 +29,8 @@ class EventResult(SQLModel, table=True):
     event_id: Optional[int] = Field(default=None, foreign_key='event.event_id')
     rider_id: Optional[int] = Field(default=None, foreign_key='rider.rider_id')
     category: str
-    total_time: timedelta
-    fastest_lap_time: Optional[timedelta] = Field(default=None)
+    total_time: str
+    fastest_lap_time: Optional[str] = Field(default=None)
     fastest_lap: Optional[int] = Field(default=None)
     laps_completed: int
 
