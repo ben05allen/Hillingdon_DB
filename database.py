@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional, List
+from typing import Optional
 from sqlmodel import SQLModel, create_engine, Field, Relationship
 
 
@@ -14,14 +14,14 @@ class Rider(SQLModel, table=True):
     isJunior: bool
     isFemale: bool
 
-    results: List['EventResult'] =  Relationship(back_populates='rider')
+    results: list['EventResult'] =  Relationship(back_populates='rider')
 
 
 class Event(SQLModel, table=True):
     event_id: int = Field(default=None, primary_key=True)
     date: date
 
-    results: List['EventResult'] = Relationship(back_populates='event')
+    results: list['EventResult'] = Relationship(back_populates='event')
 
 
 class EventResult(SQLModel, table=True):

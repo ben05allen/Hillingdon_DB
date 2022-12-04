@@ -58,7 +58,12 @@ def home(request: Request):
     context = {'request': request}
     return templates.TemplateResponse('index.html', context)
 
-    
+
+@app.get('/fastestlaps/')
+def select_fastest_laps():
+    return None
+
+
 @app.get('/events/', response_model=List[Event])
 def select_events(session: Session = Depends(get_session)):
     statement = select(Event)
