@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from sqlmodel import Session, select
-from database import engine, Event, Rider, EventResult
+from database import engine, Event, Rider, EventResult, FastestEvent, FastestLap, Ranking
 
 
 app = FastAPI()
@@ -59,7 +59,7 @@ def home(request: Request):
     return templates.TemplateResponse('index.html', context)
 
 
-@app.get('/fastestlaps/')
+@app.get('/fastestlaps/', response_model=List[FastestLap])
 def select_fastest_laps():
     return None
 

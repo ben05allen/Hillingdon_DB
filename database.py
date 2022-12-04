@@ -38,6 +38,31 @@ class EventResult(SQLModel, table=True):
     rider: Optional[Rider] = Relationship(back_populates='results')
 
 
+class FastestLap(SQLModel):
+    category: str
+    name: str
+    fastest_lap_time: str
+    fastest_lap: Optional[int]
+    event_id: int
+    isFemale: bool
+    isJunior: bool
+
+
+class FastestEvent(SQLModel):
+    category: str
+    name: str
+    total_time: str
+    event_id: int
+    isFemale: bool
+    isJunior: bool
+
+
+class Ranking(SQLModel):
+    rider_id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    seconds: int
+
+
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
     
