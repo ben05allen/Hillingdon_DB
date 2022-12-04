@@ -1,7 +1,8 @@
 import json
 import datetime
 import pathlib
-from typing import List, Union
+from typing import List, Union, Optional
+from enum import Enum
 
 from fastapi import FastAPI, Depends, Response, Request
 from fastapi.responses import HTMLResponse
@@ -9,6 +10,17 @@ from fastapi.templating import Jinja2Templates
 
 from sqlmodel import Session, select
 from database import engine, Event, Rider, EventResult, FastestEvent, FastestLap, Ranking
+
+
+class CategoryName(str, Enum):
+    frb = "frb"
+    ftt = "ftt"
+    jfrb = "jfrb"
+    jftt = "jftt"
+    jrb = "jrb"
+    jtt = "jtt"
+    rb = "rb"
+    tt = "tt"
 
 
 app = FastAPI()
@@ -67,7 +79,7 @@ def select_fastest_laps(response: Response, session: Session = Depends(get_sessi
 
 
 @app.get('/{category}_ranking/', response_model=List[Ranking])
-def select_ranking(category: str, session: Session = Depends(get_session)):
+def select_ranking(category: CategoryName, session: Session = Depends(get_session)):
     statement = f"SELECT * FROM {category}_Ranking"
     ranking = session.exec(statement)
     return ranking.all()
@@ -83,8 +95,7 @@ def select_fastest_laps(response: Response, session: Session = Depends(get_sessi
 @app.get('/events/', response_model=List[Event])
 def select_events(session: Session = Depends(get_session)):
     statement = select(Event)
-    result = session.exec(statement).all()
-    return result
+    return session.exec(statement).all()
 
 
 @app.get('/event/{event_id}', response_model=Union[Event, str])
@@ -146,17 +157,16 @@ def delete_event(event_id: int, response: Response, session: Session = Depends(g
 @app.get('/riders/', response_model=List[Rider])
 def select_riders(session: Session = Depends(get_session)):
     statement = select(Rider)
-    result = session.exec(statement).all()
-    return result
+    return session.exec(statement).all()
 
 
 @app.get('/rider/{rider_id}', response_model=Union[Rider, str])
 def rider(rider_id: int, response: Response, session: Session = Depends(get_session)):
-    track = session.get(Rider, rider_id)
-    if track is None:
+    rider = session.get(Rider, rider_id)
+    if rider is None:
         response.status_code = 404
-        return "Track no found"
-    return track
+        return "Rider no found"
+    return rider
 
 
 @app.post('/rider/', response_model=Rider, status_code=201)
@@ -208,17 +218,19 @@ def delete_rider(rider_id: int, response: Response, session: Session = Depends(g
 @app.get('/event_results/', response_model=List[EventResult])
 def select_event_results(session: Session = Depends(get_session)):
     statement = select(EventResult)
-    result = session.exec(statement).all()
-    return result
+    return session.exec(statement).all()
 
 
-@app.get('/event_result/{event_result_id}', response_model=Union[EventResult, str])
-def event_result(event_result_id: int, response: Response, session: Session = Depends(get_session)):
-    track = session.get(EventResult, event_result_id)
-    if track is None:
-        response.status_code = 404
-        return "Track no found"
-    return track
+@app.get('/event_results/rider/{rider_id}', response_model=List[EventResult])
+def event_result(rider_id: int, session: Session = Depends(get_session)):
+    statement = select(EventResult).where(EventResult.rider_id==rider_id)
+    return session.exec(statement).all()
+
+
+@app.get('/event_results/event/{event_id}', response_model=List[EventResult])
+def event_result(event_id: int, response: Response, session: Session = Depends(get_session)):
+    statement = select(EventResult).where(EventResult.event_id == event_id)
+    return session.exec(statement).all()
 
 
 @app.post('/event_result/', response_model=EventResult, status_code=201)
