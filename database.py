@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional, List
+from typing import Optional
 from sqlmodel import SQLModel, create_engine, Field, Relationship
 
 
@@ -14,14 +14,14 @@ class Rider(SQLModel, table=True):
     isJunior: bool
     isFemale: bool
 
-    results: List['EventResult'] =  Relationship(back_populates='rider')
+    results: list['EventResult'] =  Relationship(back_populates='rider')
 
 
 class Event(SQLModel, table=True):
     event_id: int = Field(default=None, primary_key=True)
     date: date
 
-    results: List['EventResult'] = Relationship(back_populates='event')
+    results: list['EventResult'] = Relationship(back_populates='event')
 
 
 class EventResult(SQLModel, table=True):
@@ -36,6 +36,31 @@ class EventResult(SQLModel, table=True):
 
     event: Optional[Event] = Relationship(back_populates='results')
     rider: Optional[Rider] = Relationship(back_populates='results')
+
+
+class FastestLap(SQLModel):
+    category: str
+    name: str
+    fastest_lap_time: str
+    fastest_lap: Optional[int]
+    event_id: int
+    isFemale: bool
+    isJunior: bool
+
+
+class FastestEvent(SQLModel):
+    category: str
+    name: str
+    total_time: str
+    event_id: int
+    isFemale: bool
+    isJunior: bool
+
+
+class Ranking(SQLModel):
+    rider_id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    seconds: int
 
 
 def create_db_and_tables():

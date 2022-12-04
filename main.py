@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from sqlmodel import Session, select
-from database import engine, Event, Rider, EventResult
+from database import engine, Event, Rider, EventResult, FastestEvent, FastestLap, Ranking
 
 
 app = FastAPI()
@@ -58,7 +58,28 @@ def home(request: Request):
     context = {'request': request}
     return templates.TemplateResponse('index.html', context)
 
-    
+
+@app.get('/fastestlaps/', response_model=List[FastestLap])
+def select_fastest_laps(response: Response, session: Session = Depends(get_session)):
+    statement = "SELECT * FROM Fastest_Laps"
+    fastest_laps = session.exec(statement)
+    return fastest_laps.all()
+
+
+@app.get('/{category}_ranking/', response_model=List[Ranking])
+def select_ranking(category: str, session: Session = Depends(get_session)):
+    statement = f"SELECT * FROM {category}_Ranking"
+    ranking = session.exec(statement)
+    return ranking.all()
+
+
+@app.get('/fastestevents/', response_model=List[FastestEvent])
+def select_fastest_laps(response: Response, session: Session = Depends(get_session)):
+    statement = "SELECT * FROM Fastest_Events"
+    fastest_laps = session.exec(statement)
+    return fastest_laps.all()
+
+
 @app.get('/events/', response_model=List[Event])
 def select_events(session: Session = Depends(get_session)):
     statement = select(Event)
@@ -68,11 +89,11 @@ def select_events(session: Session = Depends(get_session)):
 
 @app.get('/event/{event_id}', response_model=Union[Event, str])
 def event(event_id: int, response: Response, session: Session = Depends(get_session)):
-    track = session.get(Event, event_id)
-    if track is None:
+    event_res = session.get(Event, event_id)
+    if event_res is None:
         response.status_code = 404
-        return "Track no found"
-    return track
+        return "Event no found"
+    return event_res
 
 
 @app.post('/event/', response_model=Event, status_code=201)
