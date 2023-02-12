@@ -15,11 +15,21 @@ def select_event_results(session: Session = Depends(get_session)):
 
 @router.get('/{event_result_id}', response_model=EventResult|str)
 def event_result(event_result_id: int, response: Response, session: Session = Depends(get_session)):
-    track = session.get(EventResult, event_result_id)
-    if track is None:
+    results = session.get(EventResult, event_result_id)
+    if results is None:
         response.status_code = 404
-        return "Track no found"
-    return track
+        return "No result found"
+    return results
+
+
+@router.get('/rider/{rider_id}', response_model=list[EventResult]|str)
+def event_result(rider_id: int, response: Response, session: Session = Depends(get_session)):
+    statement = select(EventResult).where(EventResult.rider_id == rider_id)
+    rider_results = session.exec(statement).all()
+    if rider_results is None:
+        response.status_code = 404
+        return "No rider results found"
+    return rider_results
 
 
 @router.post('/', response_model=EventResult, status_code=201)

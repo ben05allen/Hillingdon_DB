@@ -23,13 +23,8 @@ class CategoryName(str, Enum):
     tt = "tt"
 
 
-def seconds(time: str) -> float:
-    delta = datetime.time.fromisoformat(time)
-    return 3600*delta.hour + 60*delta.minute + delta.second + delta.microsecond/1_000_000
-
-
-def add_times(times: list) -> float:
-    return sum(seconds(t) for t in times)
+def seconds(time: datetime.time) -> float:
+    return 3600*time.hour + 60*time.minute + time.second + time.microsecond/1_000_000
 
 
 @router.get('/{category}', response_model=list[Ranking])
@@ -48,29 +43,28 @@ def fastest_riders(category: CategoryName, session: Session = Depends(get_sessio
     riders = session.exec(statement).all()
     eligible_riders = {rider.rider_id: rider.name for rider in riders}
 
-    print(eligible_riders)
-
-    # get rb category
+    # get bike category
     if 'rb' in category.value:
         statement = select(EventResult).where(and_(
-            EventResult.rider_id in eligible_riders,
-            EventResult.category == CategoryName.rb.value
+            EventResult.rider_id.in_(eligible_riders),
+            EventResult.category.in_(['RB','JRB','FRB','JFRB'])
         ))
     else:
-        statement = select(EventResult).where(EventResult.rider_id in eligible_riders) ###########################################################
+        statement = select(EventResult).where(EventResult.rider_id.in_(eligible_riders)) 
             
     all_results = session.exec(statement).all()
-
-
     grouped_results = defaultdict(list)
     for result in all_results:
         grouped_results[result.rider_id].append(result.total_time)
 
-    print(grouped_results)
+    print(grouped_results[76])
 
     # take only results for riders with 6 or more results
-    return [Ranking(rider_id, eligible_riders[rider_id], sum(sorted(map(seconds, times)))[:6]) 
-            for rider_id, times in grouped_results if len(times) > 6]
+    return sorted([Ranking(**{'rider_id': rider_id, 
+                'name': eligible_riders[rider_id], 
+                'seconds': sum(sorted(map(seconds, times))[:6])} ) 
+                for rider_id, times in grouped_results.items() if len(times) >= 6],
+                key=lambda x: x.seconds)
 
 
 
