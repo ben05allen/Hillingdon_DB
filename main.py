@@ -1,30 +1,24 @@
 import pathlib
-from enum import Enum
 
 from fastapi import FastAPI, Depends, Response, Request
 from fastapi.responses import HTMLResponse
 
 
 from routers import home
+from routers import competition
 from routers import results
 from routers import riders
 from routers import events
-
-class CategoryName(str, Enum):
-    frb = "frb"
-    ftt = "ftt"
-    jfrb = "jfrb"
-    jftt = "jftt"
-    jrb = "jrb"
-    jtt = "jtt"
-    rb = "rb"
-    tt = "tt"
 
 
 app = FastAPI()
 home_dir = pathlib.Path('.')
 
 app.include_router(home.router)
+
+app.include_router(competition.router,
+    prefix='/competition', 
+    tags=['competition'])
 
 app.include_router(results.router,
     prefix='/event_result', 

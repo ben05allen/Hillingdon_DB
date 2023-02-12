@@ -53,7 +53,7 @@ class EventResult(SQLModel, table=True):
 #     isJunior: bool
 
 
-# class Ranking(SQLModel):
-#     rider_id: Optional[int] = Field(default=None, primary_key=True)
-#     name: str
-#     seconds: int
+class Ranking(SQLModel):
+    rider_id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    seconds: float
