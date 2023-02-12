@@ -63,24 +63,3 @@ app.include_router(events.router,
 #                 for result in results:
 #                     session.add(EventResult(**result))
 #                 session.commit()
-
-
-# @app.get('/fastestlaps/', response_model=List[FastestLap])
-# def select_fastest_laps(response: Response, session: Session = Depends(get_session)):
-#     statement = "SELECT * FROM Fastest_Laps"
-#     fastest_laps = session.exec(statement)
-#     return fastest_laps.all()
-
-
-# @app.get('/{category}_ranking/', response_model=List[Ranking])
-# def select_ranking(category: CategoryName, session: Session = Depends(get_session)):
-#     statement = f"SELECT * FROM {category}_Ranking"
-#     ranking = session.exec(statement)
-#     return ranking.all()
-
-
-# @app.get('/fastestevents/', response_model=List[FastestEvent])
-# def select_fastest_laps(response: Response, session: Session = Depends(get_session)):
-#     statement = "SELECT * FROM Fastest_Events"
-#     fastest_laps = session.exec(statement)
-#     return fastest_laps.all()

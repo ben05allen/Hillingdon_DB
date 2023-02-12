@@ -34,26 +34,22 @@ class EventResult(SQLModel, table=True):
     rider: Optional[Rider] = Relationship(back_populates='results')
 
 
-# class FastestLap(SQLModel):
-#     category: str
-#     name: str
-#     fastest_lap_time: Optional[time]
-#     fastest_lap: Optional[int]
-#     event_id: int
-#     isFemale: bool
-#     isJunior: bool
+class FastestLap(SQLModel):
+    rider_id: int
+    name: str
+    fastest_lap_time: time | None
+    fastest_lap: int | None
+    event_id: int
+    
 
-
-# class FastestEvent(SQLModel):
-#     category: str
-#     name: str
-#     total_time: str
-#     event_id: int
-#     isFemale: bool
-#     isJunior: bool
+class FastestEvent(SQLModel):
+    rider_id: int
+    name: str
+    total_time: time | None
+    event_id: int
 
 
 class Ranking(SQLModel):
-    rider_id: Optional[int] = Field(default=None, primary_key=True)
+    rider_id: int | None
     name: str
     seconds: float
