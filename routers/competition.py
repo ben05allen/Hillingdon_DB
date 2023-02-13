@@ -13,14 +13,14 @@ router = APIRouter()
 
 
 class CategoryName(str, Enum):
-    frb = "frb"
-    ftt = "ftt"
-    jfrb = "jfrb"
-    jftt = "jftt"
-    jrb = "jrb"
-    jtt = "jtt"
-    rb = "rb"
-    tt = "tt"
+    frb = "FRB"
+    ftt = "FTT"
+    jfrb = "JFRB"
+    jftt = "JFTT"
+    jrb = "JRB"
+    jtt = "JTT"
+    rb = "RB"
+    tt = "TT"
 
 
 def to_seconds(time: datetime.time) -> float:
@@ -29,11 +29,11 @@ def to_seconds(time: datetime.time) -> float:
 
 def riders_by_category(category: CategoryName, session: Session) -> list[Rider]:
     """get eligible riders"""
-    if category.value[0] == 'f':
+    if category.value[0] == 'F':
         statement = select(Rider).where(Rider.isFemale==True)
-    elif category.value[:2] == 'jf':
+    elif category.value[:2] == 'JF':
         statement = select(Rider).where(and_(Rider.isFemale==True, Rider.isJunior==True))
-    elif category.value[0] == 'j':
+    elif category.value[0] == 'J':
         statement = select(Rider).where(Rider.isJunior==True)
     else:
         statement = select(Rider)
@@ -43,7 +43,7 @@ def riders_by_category(category: CategoryName, session: Session) -> list[Rider]:
 
 def riders_by_race_type(category: CategoryName, riders: dict, session: Session) -> list[EventResult]:
     """get results by race type"""
-    if 'rb' in category.value:
+    if 'RB' in category.value:
         statement = select(EventResult).where(and_(
             EventResult.rider_id.in_(riders),
             EventResult.category.in_(['RB','JRB','FRB','JFRB'])
@@ -83,7 +83,7 @@ def fastest_laps(category: CategoryName, session: Session = Depends(get_session)
         if result.fastest_lap_time:
             rider_results[result.rider_id].append(result)
 
-    fastest_results = [min(rider_result, key=lambda x: x.fastest_lap_time) for rider_result in rider_results.values()]
+    fastest_results: list[EventResult] = [min(rider_result, key=lambda x: x.fastest_lap_time) for rider_result in rider_results.values()]
 
     return sorted([FastestLap(**{'rider_id': result.rider_id, 
         'name': eligible_riders[result.rider_id],
@@ -105,7 +105,7 @@ def fastest_events(category: CategoryName, session: Session = Depends(get_sessio
         if result.laps_completed == 11:
             rider_results[result.rider_id].append(result)
 
-    fastest_results = [min(rider_result, key=lambda x: x.total_time) for rider_result in rider_results.values()]
+    fastest_results: list[EventResult] = [min(rider_result, key=lambda x: x.total_time) for rider_result in rider_results.values()]
 
     return sorted([FastestEvent(**{'rider_id': result.rider_id, 
         'name': eligible_riders[result.rider_id],
