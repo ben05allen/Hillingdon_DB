@@ -73,29 +73,43 @@ def fastest_riders(category: CategoryName, session: Session = Depends(get_sessio
 
 
 @router.get('/fastest/lap/{category}', response_model=list[FastestLap])
-def fastest_riders(category: CategoryName, session: Session = Depends(get_session)):
+def fastest_laps(category: CategoryName, session: Session = Depends(get_session)):
 
     eligible_riders = {rider.rider_id: rider.name for rider in riders_by_category(category, session)}
     results = riders_by_race_type(category, eligible_riders, session)
+
+    rider_results = defaultdict(list)
+    for result in results:
+        if result.fastest_lap_time:
+            rider_results[result.rider_id].append(result)
+
+    fastest_results = [min(rider_result, key=lambda x: x.fastest_lap_time) for rider_result in rider_results.values()]
 
     return sorted([FastestLap(**{'rider_id': result.rider_id, 
         'name': eligible_riders[result.rider_id],
         'fastest_lap_time': result.fastest_lap_time,
         'fastest_lap': result.fastest_lap,
         'event_id': result.event_id}) 
-        for result in results if result.fastest_lap_time],
+        for result in fastest_results],
         key=lambda x: x.fastest_lap_time)
 
 
 @router.get('/fastest/event/{category}', response_model=list[FastestEvent])
-def fastest_riders(category: CategoryName, session: Session = Depends(get_session)):
+def fastest_events(category: CategoryName, session: Session = Depends(get_session)):
 
     eligible_riders = {rider.rider_id: rider.name for rider in riders_by_category(category, session)}
     results = riders_by_race_type(category, eligible_riders, session)
+
+    rider_results = defaultdict(list)
+    for result in results:
+        if result.laps_completed == 11:
+            rider_results[result.rider_id].append(result)
+
+    fastest_results = [min(rider_result, key=lambda x: x.total_time) for rider_result in rider_results.values()]
 
     return sorted([FastestEvent(**{'rider_id': result.rider_id, 
         'name': eligible_riders[result.rider_id],
         'total_time': result.total_time,
         'event_id': result.event_id}) 
-        for result in results if result.total_time],
+        for result in fastest_results],
         key=lambda x: x.total_time)
