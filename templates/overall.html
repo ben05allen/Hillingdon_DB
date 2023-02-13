@@ -1,0 +1,124 @@
+{% extends "index.html" %} {% block content %}
+
+<div class="flex flex-col justify-between min-h-screen">
+  <div class="flex mx-auto bg-green-100 w-full">
+    <h2 class="p-8 font-bold text-2xl text-white w-full bg-violet-900">
+      Hillingdon TT Series 2022
+    </h2>
+  </div>
+
+  <div class="py-2 text-lg">
+    <ul class="flex flex-col justify-center md:flex-row">
+      <li class="mr-6 py-1">
+        <a
+          class="text-black hover:text-violet-900 px-3 border-2 border-violet-900 rounded-full"
+          href="#"
+          >Overall</a
+        >
+      </li>
+      <li class="mr-6 py-1">
+        <a class="text-black hover:text-violet-900 px-3" href="#"
+          >Fastest Event</a
+        >
+      </li>
+      <li class="mr-6 py-1">
+        <a class="text-black hover:text-violet-900 px-3" href="#"
+          >Fastest Lap</a
+        >
+      </li>
+      <li class="ml-6">
+        <label
+          for="category"
+          class="text-gray-200 border-2 border-violet-900 bg-violet-900 rounded-l-full py-1 px-3"
+          >Category</label
+        >
+        <select
+          name="category"
+          id="category"
+          class="border-2 border-violet-900 rounded-r-full py-1 px-3 -ml-2"
+        >
+          <option value="TT">TT Bike</option>
+          <option value="RB">Road Bike</option>
+          <option value="FTT">Female TT Bike</option>
+          <option value="FRB">Female Road Bike</option>
+          <option value="JFRB">Junior Female Road Bike</option>
+          <option value="JFTT">Junior Female TT Bike</option>
+          <option value="JRB">Junior Road Bike</option>
+          <option value="JTT">Junior TT Bike</option>
+        </select>
+      </li>
+    </ul>
+  </div>
+
+  <div class="container mx-auto my-24 flex justify-center">
+    <table id="resultsTbl" class="table-auto">
+      <thead>
+        <tr class="text-violet-900">
+          <th class="px-6">Position</th>
+          <th class="px-6">Name</th>
+          <th class="px-6">Time (sec)</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <footer class="mt-auto">
+    <div class="bg-gray-800 text-gray-200 mx-auto py-3">
+      <p class="px-10 text-right">&copy; 2023</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+  function updateTable() {
+    const dropDown = document.getElementById("category");
+    const tt_url = "http://127.0.0.1:8000/competition/" + dropDown.value;
+
+    fetch(tt_url)
+      .then((response) => response.json())
+      .then((objects) => {
+        const resultsTbl = document.getElementById("resultsBody");
+
+        // clear out the table body
+        resultsTbl.innerHTML = "";
+
+        // count positions with i
+        var i = 1;
+        objects.forEach((object) => {
+          const row = document.createElement("tr");
+
+          const positionCell = document.createElement("td");
+          positionCell.innerHTML = i;
+          positionCell.classList.add(
+            "text-center",
+            "font-bold",
+            "border",
+            "px-4",
+            "py-2"
+          );
+          row.appendChild(positionCell);
+
+          const nameCell = document.createElement("td");
+          nameCell.innerHTML = object.name;
+          nameCell.classList.add("border", "px-4", "py-2");
+          row.appendChild(nameCell);
+
+          const timeCell = document.createElement("td");
+          timeCell.innerHTML = object.seconds.toFixed(1);
+          timeCell.classList.add("text-right", "border", "px-4", "py-2");
+          row.appendChild(timeCell);
+
+          resultsTbl.appendChild(row);
+          i += 1;
+        });
+      });
+  }
+
+  window.onload = updateTable;
+
+  const dropDownListener = document.getElementById("category");
+  dropDownListener.addEventListener("change", updateTable);
+</script>
+
+{% endblock %}

@@ -13,8 +13,8 @@ router = APIRouter()
 
 @router.get('/', response_class=HTMLResponse)
 def home(request: Request):
-    context = {'request': request, 'competition_results': [1,2,3,4]}
-    return templates.TemplateResponse('index.html', context)
+    context = {'request': request}
+    return templates.TemplateResponse('overall.html', context)
 
 # @router.post('/')
 # def get_category(category: str):
